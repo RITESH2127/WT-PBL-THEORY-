@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Events - Smart EMS{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Discover Events</h2>
+    
+    <form action="{{ url_for('events') }}" method="GET" style="display: flex; gap: 1rem;">
+        <input type="text" name="search" class="form-control" placeholder="Search events..." value="{{ request.args.get('search', '') }}" style="width: 250px;">
+        <select name="category" class="form-control" style="width: auto; background: var(--bg-color); color: var(--text-color);">
+            <option value="">All Categories</option>
+            <option value="Tech" {% if request.args.get('category') == 'Tech' %}selected{% endif %}>Tech</option>
+            <option value="Business" {% if request.args.get('category') == 'Business' %}selected{% endif %}>Business</option>
+            <option value="Music" {% if request.args.get('category') == 'Music' %}selected{% endif %}>Music</option>
+            <option value="Sports" {% if request.args.get('category') == 'Sports' %}selected{% endif %}>Sports</option>
+            <option value="Workshop" {% if request.args.get('category') == 'Workshop' %}selected{% endif %}>Workshop</option>
+        </select>
+        <button type="submit" class="btn btn-primary"><i class="ph ph-magnifying-glass"></i> Filter</button>
+    </form>
+</div>
+
+{% if events %}
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
+    {% for event in events %}
+    <div class="glass-panel" style="overflow: hidden; display: flex; flex-direction: column;">
+        <div style="height: 180px; background: url('{{ event.image_url }}') center/cover; position: relative;">
+            <div style="position: absolute; top: 1rem; right: 1rem; background: var(--primary-color); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">
+                {{ event.category }}
+            </div>
+        </div>
+        <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+            <h3 style="margin-bottom: 0.5rem; color: var(--primary-color);">{{ event.title }}</h3>
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                <span><i class="ph ph-calendar"></i> {{ event.date }}</span>
+                <span><i class="ph ph-clock"></i> {{ event.time }}</span>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; font-size: 0.95rem; line-height: 1.5;">
+                {{ event.description[:100] }}...
+            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.85rem; color: {{ 'var(--danger-color)' if event.available_seats < 10 else 'var(--secondary-color)' }};">
+                    <i class="ph-fill ph-users"></i> {{ event.available_seats }} seats left
+                </span>
+                <a href="{{ url_for('event_details', id=event.id) }}" class="btn" style="background: var(--bg-color); border: 1px solid var(--primary-color); color: var(--primary-color);">Details <i class="ph ph-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="glass-panel" style="padding: 4rem; text-align: center;">
+    <i class="ph ph-calendar-x" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+    <h3>No events found</h3>
+    <p style="color: var(--text-muted); margin-top: 0.5rem;">Try adjusting your search or filters.</p>
+    <a href="{{ url_for('events') }}" class="btn btn-primary" style="margin-top: 1.5rem;">View All Events</a>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Smart EMS{% endblock %}
+
+{% block content %}
+<div class="hero" style="text-align: center; padding: 4rem 1rem; margin-bottom: 3rem; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; border-radius: 20px; box-shadow: var(--glass-shadow);">
+    <h1 style="font-size: 3.5rem; margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Discover Awesome Events</h1>
+    <p style="font-size: 1.25rem; opacity: 0.9; margin-bottom: 2rem;">Join the best tech, music, and startup events near you.</p>
+    <a href="{{ url_for('events') }}" class="btn" style="font-size: 1.1rem; padding: 0.75rem 1.5rem; background: white; color: var(--primary-color); font-weight: bold;">Browse Events</a>
+</div>
+
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="color: var(--text-color);">Featured Events 🔥</h2>
+        <a href="{{ url_for('events') }}" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">View All <i class="ph ph-arrow-right"></i></a>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
+        {% for event in featured_events %}
+        <div class="glass-panel" style="overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s ease;">
+            <div style="height: 180px; background: url('{{ event.image_url }}') center/cover; position: relative;">
+                <div style="position: absolute; top: 1rem; right: 1rem; background: var(--primary-color); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">
+                    {{ event.category }}
+                </div>
+            </div>
+            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-color);">{{ event.title }}</h3>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                    <span><i class="ph ph-calendar"></i> {{ event.date }}</span>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; font-size: 0.95rem; line-height: 1.5;">
+                    {{ event.description[:80] }}...
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <a href="{{ url_for('event_details', id=event.id) }}" class="btn btn-primary" style="width: 100%; justify-content: center;">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p style="color: var(--text-muted);">No upcoming events at the moment. Please check back later!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

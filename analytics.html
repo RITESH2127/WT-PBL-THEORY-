@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Analytics Dashboard - Smart EMS{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('popularEventsChart').getContext('2d');
+        const popularEventsData = {{ popular_events | tojson }};
+        
+        const labels = popularEventsData.map(e => e.title);
+        const data = popularEventsData.map(e => e.registrations);
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Registrations',
+                    data: data,
+                    backgroundColor: 'rgba(79, 70, 229, 0.6)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        ticks: { color: 'var(--text-muted)' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: 'var(--text-muted)' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: 'var(--text-color)' }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <h2><i class="ph ph-chart-bar"></i> Analytics Dashboard</h2>
+    <p style="color: var(--text-muted);">Overview of system usage and popular events.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+    <!-- Stat Card 1 -->
+    <div class="glass-panel" style="padding: 2rem; text-align: center; border-bottom: 4px solid var(--primary-color);">
+        <i class="ph-fill ph-users" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+        <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ total_users }}</h3>
+        <p style="color: var(--text-muted); font-weight: 500;">Total Registered Users</p>
+    </div>
+    
+    <!-- Stat Card 2 -->
+    <div class="glass-panel" style="padding: 2rem; text-align: center; border-bottom: 4px solid var(--secondary-color);">
+        <i class="ph-fill ph-ticket" style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 1rem;"></i>
+        <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ popular_events | length }}</h3>
+        <p style="color: var(--text-muted); font-weight: 500;">Active Event Metrics</p>
+    </div>
+</div>
+
+<div class="glass-panel" style="padding: 2rem;">
+    <h3 style="margin-bottom: 1.5rem; text-align: center;">Most Popular Events</h3>
+    <div style="height: 400px; width: 100%;">
+        <canvas id="popularEventsChart"></canvas>
+    </div>
+    {% if not popular_events %}
+    <p style="text-align: center; color: var(--text-muted); margin-top: 1rem;">Not enough data yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart EMS{% endblock %}</title>
+    
+    <!-- Fonts & Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Main Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="glass-panel" style="border-radius: 0; border-top: none; border-left: none; border-right: none;">
+        <a href="{{ url_for('index') }}" class="nav-brand">
+            <i class="ph-fill ph-calendar-star"></i>
+            EMS Portal
+        </a>
+        
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">Home</a>
+            {% if current_user %}
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('logout') }}">Logout ({{ current_user.name }})</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Register</a>
+            {% endif %}
+            
+            <button id="theme-toggle" class="btn-icon" aria-label="Toggle theme">
+                <i id="theme-icon" class="ph ph-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Hidden Flash Messages for JS to parse -->
+    <div style="display: none;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flask-flash-message" data-category="{{ category }}" data-message="{{ message }}"></div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Script -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

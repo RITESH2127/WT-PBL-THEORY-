@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Register - Smart EMS{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="display: flex; align-items: center; justify-content: center; min-height: 70vh;">
+    <div class="auth-container glass-panel" style="max-width: 900px; display: flex; flex-direction: row; padding: 0; overflow: hidden; width: 100%; margin: 0; box-shadow: var(--glass-shadow); border-radius: 20px;">
+        
+        <!-- Left Side: Image/Branding (Hidden on mobile) -->
+        <div class="auth-banner" style="flex: 1; background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%); color: white; padding: 3rem 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+            <i class="ph-fill ph-rocket" style="font-size: 5rem; margin-bottom: 1rem;"></i>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem; color: white;">Join Us Today!</h2>
+            <p style="font-size: 1.1rem; opacity: 0.9;">Create an account to register for exclusive events, track your engagement, and earn badges.</p>
+        </div>
+
+        <!-- Right Side: Register Form -->
+        <div style="flex: 1; padding: 3rem 2.5rem; display: flex; flex-direction: column; justify-content: center;">
+            <h2 style="margin-bottom: 1.5rem; color: var(--text-color); font-size: 1.8rem;">Create an Account</h2>
+            <form action="{{ url_for('register') }}" method="POST">
+                <div class="form-group">
+                    <label for="name" style="font-weight: 600;">Full Name</label>
+                    <div style="position: relative;">
+                        <i class="ph ph-user" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;"></i>
+                        <input type="text" id="name" name="name" class="form-control" required placeholder="John Doe" style="padding-left: 2.8rem;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email" style="font-weight: 600;">Email Address</label>
+                    <div style="position: relative;">
+                        <i class="ph ph-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;"></i>
+                        <input type="email" id="email" name="email" class="form-control" required placeholder="john@example.com" style="padding-left: 2.8rem;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password" style="font-weight: 600;">Password</label>
+                    <div style="position: relative;">
+                        <i class="ph ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;"></i>
+                        <input type="password" id="password" name="password" class="form-control" required placeholder="••••••••" style="padding-left: 2.8rem;">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem; padding: 0.75rem; font-size: 1.1rem; border-radius: 10px;">
+                    Register
+                </button>
+            </form>
+            <p style="text-align: center; margin-top: 2rem; color: var(--text-muted);">
+                Already have an account? <a href="{{ url_for('login') }}" style="color: var(--primary-color); font-weight: 600;">Login here</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

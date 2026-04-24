@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% block title %}{{ event.title }} - Smart EMS{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="overflow: hidden; margin-bottom: 2rem;">
+    <!-- Hero Header -->
+    <div style="height: 300px; background: url('{{ event.image_url }}') center/cover; position: relative;">
+        <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 2rem;">
+            <span style="background: var(--primary-color); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 0.5rem; display: inline-block;">
+                {{ event.category }}
+            </span>
+            <h1 style="color: white; font-size: 2.5rem; margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ event.title }}</h1>
+        </div>
+    </div>
+    
+    <div style="display: flex; flex-wrap: wrap; padding: 2rem; gap: 2rem;">
+        <!-- Left Column: Details -->
+        <div style="flex: 2; min-width: 300px;">
+            <h3 style="color: var(--primary-color); margin-bottom: 1rem;"><i class="ph ph-info"></i> About this Event</h3>
+            <p style="color: var(--text-color); line-height: 1.7; font-size: 1.05rem; white-space: pre-wrap;">{{ event.description }}</p>
+            
+            <div style="margin-top: 2rem; background: var(--bg-color); border: 1px solid var(--glass-border); padding: 1.5rem; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <strong style="color: var(--text-muted); display: block; font-size: 0.9rem;">Date</strong>
+                    <span><i class="ph ph-calendar"></i> {{ event.date }}</span>
+                </div>
+                <div>
+                    <strong style="color: var(--text-muted); display: block; font-size: 0.9rem;">Time</strong>
+                    <span><i class="ph ph-clock"></i> {{ event.time }}</span>
+                </div>
+                <div style="grid-column: span 2;">
+                    <strong style="color: var(--text-muted); display: block; font-size: 0.9rem;">Venue</strong>
+                    <span><i class="ph ph-map-pin"></i> {{ event.venue }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column: Registration Card -->
+        <div style="flex: 1; min-width: 300px;">
+            <div class="glass-panel" style="padding: 1.5rem; border: 2px solid var(--primary-color); position: sticky; top: 100px;">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 0.5rem;">Registration</h3>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: {{ 'var(--danger-color)' if event.available_seats < 10 else 'var(--secondary-color)' }};">
+                        {{ event.available_seats }} / {{ event.total_seats }}
+                    </div>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Seats Available</span>
+                </div>
+                
+                <!-- Countdown Timer Container -->
+                <div id="countdown" data-date="{{ event.date }}T{{ event.time }}" style="text-align: center; margin-bottom: 1.5rem; background: var(--bg-color); padding: 1rem; border-radius: 8px;">
+                    <span style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Event Starts In</span>
+                    <div style="display: flex; justify-content: center; gap: 0.5rem; font-weight: bold; font-size: 1.2rem; color: var(--primary-color);">
+                        <div style="display: flex; flex-direction: column; align-items: center;"><span id="cd-days">00</span><span style="font-size: 0.7rem; color: var(--text-muted);">Days</span></div>:
+                        <div style="display: flex; flex-direction: column; align-items: center;"><span id="cd-hours">00</span><span style="font-size: 0.7rem; color: var(--text-muted);">Hrs</span></div>:
+                        <div style="display: flex; flex-direction: column; align-items: center;"><span id="cd-mins">00</span><span style="font-size: 0.7rem; color: var(--text-muted);">Min</span></div>:
+                        <div style="display: flex; flex-direction: column; align-items: center;"><span id="cd-secs">00</span><span style="font-size: 0.7rem; color: var(--text-muted);">Sec</span></div>
+                    </div>
+                </div>
+
+                <form action="{{ url_for('register_event', id=event.id) }}" method="POST">
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 1rem;" {% if event.available_seats <= 0 %}disabled{% endif %}>
+                        {% if event.available_seats > 0 %}
+                            <i class="ph ph-ticket"></i> Register Now
+                        {% else %}
+                            Sold Out
+                        {% endif %}
+                    </button>
+                </form>
+                {% if not current_user %}
+                <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                    You must be <a href="{{ url_for('login') }}" style="color: var(--primary-color);">logged in</a> to register.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div style="padding: 2rem; border-top: 1px solid var(--glass-border); margin-top: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: var(--primary-color);"><i class="ph ph-chats"></i> Discussion</h3>
+        
+        {% if current_user %}
+        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+            <div style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">
+                {{ current_user.name[0].upper() }}
+            </div>
+            <div style="flex-grow: 1;">
+                <textarea id="comment-input" class="form-control" rows="2" placeholder="Ask a question or share your thoughts..." style="resize: vertical;"></textarea>
+                <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+                    <button id="post-comment-btn" class="btn btn-primary btn-sm"><i class="ph ph-paper-plane-right"></i> Post</button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div style="background: var(--bg-color); padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 2rem; border: 1px solid var(--glass-border);">
+            <p style="color: var(--text-muted);"><a href="{{ url_for('login') }}" style="color: var(--primary-color);">Log in</a> to join the discussion.</p>
+        </div>
+        {% endif %}
+
+        <div id="comments-list" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Comments will be loaded via JS -->
+            <div style="text-align: center; color: var(--text-muted);"><i class="ph ph-spinner spinner" style="display: inline-block;"></i> Loading comments...</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Countdown Timer logic
+    document.addEventListener('DOMContentLoaded', () => {
+        const cdContainer = document.getElementById('countdown');
+        if (!cdContainer) return;
+        
+        const targetDateStr = cdContainer.dataset.date;
+        const targetDate = new Date(targetDateStr).getTime();
+        
+        const timer = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+            
+            if (distance < 0) {
+                clearInterval(timer);
+                document.getElementById('cd-days').innerText = "00";
+                document.getElementById('cd-hours').innerText = "00";
+                document.getElementById('cd-mins').innerText = "00";
+                document.getElementById('cd-secs').innerText = "00";
+                return;
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            document.getElementById('cd-days').innerText = days.toString().padStart(2, '0');
+            document.getElementById('cd-hours').innerText = hours.toString().padStart(2, '0');
+            document.getElementById('cd-mins').innerText = minutes.toString().padStart(2, '0');
+            document.getElementById('cd-secs').innerText = seconds.toString().padStart(2, '0');
+        }, 1000);
+        
+        // Comments Logic
+        const eventId = {{ event.id }};
+        const commentsList = document.getElementById('comments-list');
+        const commentInput = document.getElementById('comment-input');
+        const postCommentBtn = document.getElementById('post-comment-btn');
+        
+        function renderComment(comment) {
+            const div = document.createElement('div');
+            div.style.display = 'flex';
+            div.style.gap = '1rem';
+            
+            // Format date loosely
+            const dateStr = new Date(comment.timestamp).toLocaleString();
+            
+            div.innerHTML = `
+                <div style="background: var(--bg-color); color: var(--text-color); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; border: 1px solid var(--glass-border);">
+                    ${comment.user.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                    <div style="margin-bottom: 0.25rem;">
+                        <strong style="color: var(--text-color);">${comment.user}</strong>
+                        <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: 0.5rem;">${dateStr}</span>
+                    </div>
+                    <p style="color: var(--text-muted); line-height: 1.5;">${comment.text}</p>
+                </div>
+            `;
+            return div;
+        }
+
+        function loadComments() {
+            fetch(`/event/${eventId}/comments`)
+                .then(res => res.json())
+                .then(data => {
+                    commentsList.innerHTML = '';
+                    if (data.comments.length === 0) {
+                        commentsList.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No comments yet. Be the first to start the discussion!</p>';
+                        return;
+                    }
+                    data.comments.forEach(comment => {
+                        commentsList.appendChild(renderComment(comment));
+                    });
+                })
+                .catch(err => {
+                    commentsList.innerHTML = '<p style="color: var(--danger-color);">Error loading comments.</p>';
+                    console.error(err);
+                });
+        }
+        
+        loadComments(); // initial load
+        
+        if (postCommentBtn) {
+            postCommentBtn.addEventListener('click', () => {
+                const text = commentInput.value.trim();
+                if (!text) return;
+                
+                postCommentBtn.disabled = true;
+                postCommentBtn.innerHTML = '<i class="ph ph-spinner spinner" style="display: inline-block;"></i> Posting...';
+                
+                fetch(`/event/${eventId}/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({text})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        commentInput.value = '';
+                        // Remove empty placeholder if present
+                        if (commentsList.children.length === 1 && commentsList.children[0].tagName === 'P') {
+                            commentsList.innerHTML = '';
+                        }
+                        // Prepend new comment
+                        commentsList.insertBefore(renderComment(data.comment), commentsList.firstChild);
+                        showToast('Comment posted successfully');
+                    } else {
+                        showToast(data.error || 'Error posting comment', 'error');
+                    }
+                })
+                .catch(err => {
+                    showToast('Network error', 'error');
+                })
+                .finally(() => {
+                    postCommentBtn.disabled = false;
+                    postCommentBtn.innerHTML = '<i class="ph ph-paper-plane-right"></i> Post';
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}
